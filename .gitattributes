@@ -1,0 +1,2 @@
+models/rvl_cdip_vit_model/* filter=lfs diff=lfs merge=lfs -text
+models/rvl_cdip_swin_model/* filter=lfs diff=lfs merge=lfs -text
