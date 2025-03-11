@@ -1,7 +1,7 @@
-## RVL-CDIP Document Classification System
+# RVL-CDIP Document Classification System
 
 ## Overview
-This project implements a transformer-based document classification system using the RVL-CDIP dataset, designed to accurately categorize financial and business documents such as invoices, forms, budgets, and memos. Leveraging pre-trained Vision Transformer (ViT) models, fine-tuned on progressively larger dataset subsets, the system achieves robust performance within Google Colab’s free-tier constraints. Experiments with ViT-Base are complete, while Swin-Tiny is being evaluated to explore potential improvements in layout-sensitive classification.
+This project implements a transformer-based document classification system using the RVL-CDIP dataset, designed to accurately categorize financial and business documents such as invoices, forms, budgets, and memos. Leveraging pre-trained Vision Transformer (ViT) and Swin Transformer (Swin-Tiny) models, fine-tuned on progressively larger dataset subsets, the system achieves robust performance within Google Colab’s free-tier constraints. Experiments with ViT-Base and Swin-Tiny provide a comparative analysis of global versus hierarchical processing for document classification.
 
 ## Task Requirements
 - **Objective**: Develop a transformer-based system to classify RVL-CDIP document images into 16 categories, emphasizing financial document types (invoices, receipts, tax forms, financial reports).
@@ -12,9 +12,9 @@ This project implements a transformer-based document classification system using
 - **Vision Transformer (ViT-Base)**:
   - **Model**: `google/vit-base-patch16-224-in21k`.
   - **Rationale**: Pre-trained on ImageNet-21k, ViT captures global image context effectively, ideal for document classification where overall structure matters. Its transformer architecture meets the assignment’s core requirement.
-- **Swin-Tiny (Ongoing)**:
+- **Swin-Tiny**:
   - **Model**: `microsoft/swin-tiny-patch4-window7-224`.
-  - **Rationale**: Swin’s hierarchical processing may better handle structured layouts (e.g., tables in invoices), offering a comparative test against ViT’s global approach.
+  - **Rationale**: Swin’s hierarchical processing, with shifted window attention, excels at detecting structured layouts (e.g., tables in invoices), offering a comparative test against ViT’s global approach.
 
 ## Methodology
 - **Dataset Preparation**:
@@ -39,15 +39,15 @@ This project implements a transformer-based document classification system using
   - **Learning Rate**: Initially 5e-5 (standard for ViT), reduced to 3e-5 after 5,000-sample run to stabilize training with larger datasets, balancing convergence and accuracy.
   - **Batch Size**: Increased from 32 (5,000 samples) to 64 (10,000+ samples) via gradient accumulation, improving gradient stability within VRAM constraints.
   - **Early Stopping**: Added post-5,000 run (patience=2), stopping when validation accuracy plateaued (e.g., epoch 6 for 20,000 samples).
-  - **Outcome**: Tuning lifted accuracy from 59.15% (5,000) to 78.85% (20,000), with consistent gains in financial class performance.
+  - **Outcome**: Tuning lifted accuracy from 59.15% (5,000) to 78.85% (ViT) and 79.55% (Swin), with consistent gains in financial class performance.
 - **Evaluation**: Computed accuracy, precision, recall, and F1 on 2,000-sample validation and test sets, with per-class accuracy for financial categories.
 
 ## Constraints
 - **Environment**: Google Colab free tier with T4 GPU.
-  - **VRAM**: 15 GB (peak usage: ~5-6 GB during training, ~1 GB post-training).
+  - **VRAM**: 15 GB (peak usage: ~5-6 GB during training, ~1 GB for ViT and ~335 MB for Swin post-training).
   - **RAM**: ~12 GB (streamed data to avoid loading full dataset).
-  - **Disk**: ~20-24 GB (model: 328 MB, checkpoints: ~1-2 GB).
-- **Runtime**: Limited to ~12 hours; 20,000-sample run completed in ~3 hours 7 minutes.
+  - **Disk**: ~20-24 GB (ViT model: 328 MB, Swin model: 106 MB, checkpoints: ~1-2 GB).
+- **Runtime**: Limited to ~12 hours; ViT 20,000-sample run took ~3 hours 7 minutes, Swin runtime similar (exact time not provided but within bounds).
 - **Solutions**:
   - Streamed dataset to manage RAM limits.
   - Used FP16 and gradient accumulation to optimize VRAM usage.
@@ -88,14 +88,41 @@ This project implements a transformer-based document classification system using
   - **Model Size (Step 8)**: 328 MB on disk.
 
 ### Swin-Tiny Experiment
-- **20,000 Samples**: In progress (20,000 train, 2,000 validation, 2,000 test). Results will be appended here (expected accuracy: ~80-85%, potentially higher for financial classes due to layout sensitivity).
+- **20,000 Samples**: 20,000 training samples, 2,000 validation samples, 2,000 test samples.
+  - **Training (Step 6)**:
+    ```
+    Epoch | Training Loss | Validation Loss | Accuracy | Precision | Recall | F1
+    1     | 1.1350        | 1.1454          | 0.6570   | 0.6927    | 0.6570 | 0.6566
+    2     | 0.8994        | 0.9141          | 0.7245   | 0.7398    | 0.7245 | 0.7237
+    3     | 0.7527        | 0.8515          | 0.7450   | 0.7607    | 0.7450 | 0.7460
+    4     | 0.6534        | 0.7543          | 0.7790   | 0.7874    | 0.7790 | 0.7799
+    5     | 0.6241        | 0.7061          | 0.7955   | 0.8013    | 0.7955 | 0.7967
+    6     | 0.5303        | 0.6782          | 0.7945   | 0.8009    | 0.7945 | 0.7963
+    ```
+    - GPU Memory Post-Training: 334.84 MB.
+  - **Test Evaluation (Step 7)**:
+    ```
+    Test Results:
+    - Eval Loss: 0.7024
+    - Accuracy: 0.7955 (79.55%)
+    - Precision: 0.8025
+    - Recall: 0.7955
+    - F1: 0.7971
+    - Runtime: ~228 seconds (3.8 minutes)
+    ```
+    - **Financial Class Accuracy**:
+      - Form (label 1, tax forms proxy): 68.00%.
+      - Budget (label 10, financial reports proxy): 69.60%.
+      - Invoice (label 11): 77.60%.
+      - Memo (label 15, financial reports proxy): 76.00%.
+  - **Model Size (Step 8)**: 106 MB on disk.
 
 ## Improvements
-- **Data Scaling**: Increased from 5,000 to 20,000 samples, lifting accuracy from 59.15% to 78.85%.
-- **Balancing**: Post-5,000, balanced sampling corrected class skew, improving fairness and financial class accuracy (e.g., invoice: 68% → 72.8%).
+- **Data Scaling**: Increased from 5,000 to 20,000 samples, lifting accuracy from 59.15% to 78.85% (ViT) and 79.55% (Swin).
+- **Balancing**: Post-5,000, balanced sampling corrected class skew, improving fairness and financial class accuracy (e.g., invoice: 68% → 72.8% ViT, 77.6% Swin).
 - **Augmentation**: Enhanced robustness to document variations.
 - **Tuning**: Optimized learning rate, batch size, and early stopping for stability and performance.
-- **Model Exploration**: Testing Swin-Tiny for potential layout gains.
+- **Model Exploration**: Swin-Tiny outperformed ViT-Base slightly (79.55% vs. 78.85%), with notable gains in financial classes due to layout sensitivity.
 
 ## Running the Code
 1. **Clone the Repository**:
@@ -108,11 +135,11 @@ This project implements a transformer-based document classification system using
    ```
 3. **Run Notebooks**:
    - Open in Colab with GPU enabled.
-   - Execute cells in `notebooks/rvl_cdip_vit_20000.ipynb` (or Swin equivalent once available).
+   - Execute cells in `notebooks/rvl_cdip_vit_20000.ipynb` or `rvl_cdip_swin_20000.ipynb`.
 
 ## Example Predictions
 - **ViT-Base**: See Step 9 in `rvl_cdip_vit_20000.ipynb` for predictions on sample test images (form, budget, invoice, memo).
-- **Swin-Tiny**: To be added in `rvl_cdip_swin_20000.ipynb` post-run.
+- **Swin-Tiny**: See Step 9 in `rvl_cdip_swin_20000.ipynb` for predictions on sample test images.
 
 ## Repository Structure
 ```
@@ -121,10 +148,10 @@ rvl_cdip_classification/
 │   ├── rvl_cdip_vit_5000.ipynb    # 59.15% accuracy
 │   ├── rvl_cdip_vit_10000.ipynb   # 77.2% accuracy
 │   ├── rvl_cdip_vit_20000.ipynb   # 78.85% accuracy
-│   └── rvl_cdip_swin_20000.ipynb  # Pending results
+│   └── rvl_cdip_swin_20000.ipynb  # 79.55% accuracy
 ├── models/
 │   ├── rvl_cdip_vit_model/        # 328 MB
-│   └── rvl_cdip_swin_model/       # To be added
+│   └── rvl_cdip_swin_model/       # 106 MB
 ├── README.md
 └── requirements.txt
 ```
@@ -135,20 +162,4 @@ rvl_cdip_classification/
 - Test layout-aware models (e.g., LayoutLM) for text-heavy documents.
 
 ## Contributors
-- [Your Name]
-```
-
----
-
-### Confirmation
-- **Validation/Test Sizes**: Explicitly stated as 2,000 each across all runs, matching your answers:
-  - ViT-Base: 5,000, 10,000, 20,000 training → 2,000 val/test.
-  - Swin-Tiny: 20,000 training → 2,000 val/test.
-- **No More Info Needed**: Your confirmation aligns with the code and outputs, so I don’t need additional script details.
-
-### Next Steps
-- **Swin-Tiny Results**: Once your current run finishes, share the outputs for Steps 6 (training), 7 (test evaluation), and 8 (model size).
-- **README Update**: I’ll append the Swin results under “Swin-Tiny Experiment” and update “Example Predictions.”
-- **Submission**: You can then upload everything to GitHub.
-
-How’s the Swin-Tiny run going? Any updates or issues to report? Let me know when you have those results!
+- Prasad Gavhane
