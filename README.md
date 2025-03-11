@@ -58,7 +58,7 @@ This project implements a transformer-based document classification system using
 - **5,000 Samples**: Initial run achieved 59.15% accuracy (unbalanced data).
 - **10,000 Samples**: Improved to 77.2% with balanced sampling and early stopping.
 - **20,000 Samples**:
-  - **Training (Step 6)**: 20,000 training samples, 2,000 validation samples.
+  - **Training**: 20,000 training samples, 2,000 validation samples.
     ```
     Epoch | Training Loss | Validation Loss | Accuracy | Precision | Recall | F1
     1     | 1.4753        | 1.4567          | 0.6325   | 0.6540    | 0.6325 | 0.6218
@@ -70,7 +70,7 @@ This project implements a transformer-based document classification system using
     ```
     - Training Time: ~3 hours 7 minutes.
     - GPU Memory Post-Training: 1000 MB (~1 GB).
-  - **Test Evaluation (Step 7)**: 2,000 test samples.
+  - **Test Evaluation**: 2,000 test samples.
     ```
     Test Results:
     - Eval Loss: 0.8202
@@ -85,11 +85,11 @@ This project implements a transformer-based document classification system using
       - Budget (label 10, financial reports proxy): 62.40%.
       - Invoice (label 11): 72.80%.
       - Memo (label 15, financial reports proxy): 71.20%.
-  - **Model Size (Step 8)**: 328 MB on disk.
+  - **Model Size**: 328 MB on disk.
 
 ### Swin-Tiny Experiment
 - **20,000 Samples**: 20,000 training samples, 2,000 validation samples, 2,000 test samples.
-  - **Training (Step 6)**:
+  - **Training**:
     ```
     Epoch | Training Loss | Validation Loss | Accuracy | Precision | Recall | F1
     1     | 1.1350        | 1.1454          | 0.6570   | 0.6927    | 0.6570 | 0.6566
@@ -100,7 +100,7 @@ This project implements a transformer-based document classification system using
     6     | 0.5303        | 0.6782          | 0.7945   | 0.8009    | 0.7945 | 0.7963
     ```
     - GPU Memory Post-Training: 334.84 MB.
-  - **Test Evaluation (Step 7)**:
+  - **Test Evaluation**:
     ```
     Test Results:
     - Eval Loss: 0.7024
@@ -115,7 +115,7 @@ This project implements a transformer-based document classification system using
       - Budget (label 10, financial reports proxy): 69.60%.
       - Invoice (label 11): 77.60%.
       - Memo (label 15, financial reports proxy): 76.00%.
-  - **Model Size (Step 8)**: 106 MB on disk.
+  - **Model Size**: 106 MB on disk.
 
 ## Improvements
 - **Data Scaling**: Increased from 5,000 to 20,000 samples, lifting accuracy from 59.15% to 78.85% (ViT) and 79.55% (Swin).
@@ -136,10 +136,6 @@ This project implements a transformer-based document classification system using
 3. **Run Notebooks**:
    - Open in Colab with GPU enabled.
    - Execute cells in `notebooks/rvl_cdip_vit_20000.ipynb` or `rvl_cdip_swin_20000.ipynb`.
-
-## Example Predictions
-- **ViT-Base**: See Step 9 in `rvl_cdip_vit_20000.ipynb` for predictions on sample test images (form, budget, invoice, memo).
-- **Swin-Tiny**: See Step 9 in `rvl_cdip_swin_20000.ipynb` for predictions on sample test images.
 
 ## Repository Structure
 ```
