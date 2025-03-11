@@ -129,11 +129,7 @@ This project implements a transformer-based document classification system using
    ```bash
    git clone <repo-url>
    ```
-2. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Run Notebooks**:
+2. **Run Notebooks**:
    - Open in Colab with GPU enabled.
    - Execute cells in `notebooks/rvl_cdip_vit_20000.ipynb` or `rvl_cdip_swin_20000.ipynb`.
 
@@ -148,8 +144,7 @@ rvl_cdip_classification/
 ├── models/
 │   ├── rvl_cdip_vit_model/        # 328 MB
 │   └── rvl_cdip_swin_model/       # 106 MB
-├── README.md
-└── requirements.txt
+└── README.md
 ```
 
 ## Future Work
