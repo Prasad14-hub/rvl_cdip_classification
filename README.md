@@ -158,7 +158,6 @@ rvl_cdip_classification/
 
 ## Future Work
 - Scale to the full 320,000-sample dataset with paid resources.
-- Upload models to Hugging Face Hub (optional).
 - Test layout-aware models (e.g., LayoutLM) for text-heavy documents.
 
 ## Contributors
