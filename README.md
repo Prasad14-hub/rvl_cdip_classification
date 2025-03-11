@@ -3,7 +3,7 @@
 ## Overview
 This project implements a transformer-based document classification system using the RVL-CDIP dataset, designed to accurately categorize financial and business documents such as invoices, forms, budgets, and memos. Leveraging pre-trained Vision Transformer (ViT) models, fine-tuned on progressively larger dataset subsets, the system achieves robust performance within Google Colab’s free-tier constraints. Experiments with ViT-Base are complete, while Swin-Tiny is being evaluated to explore potential improvements in layout-sensitive classification.
 
-## Assignment Requirements
+## Task Requirements
 - **Objective**: Develop a transformer-based system to classify RVL-CDIP document images into 16 categories, emphasizing financial document types (invoices, receipts, tax forms, financial reports).
 - **Dataset**: `aharley/rvl_cdip` from Hugging Face (400,000 grayscale images, 16 classes: 320,000 train, 40,000 validation, 40,000 test).
 - **Financial Focus**: Prioritizes categories like invoices (label 11), forms (label 1, proxy for tax forms), budgets (label 10, proxy for financial reports), and memos (label 15, proxy for financial reports).
